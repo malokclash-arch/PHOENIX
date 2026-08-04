@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مولد الكابشن — أدوات Phoenix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#0a0806; --bg-1:#141009; --ink:#f3ead9; --ink-dim:#a99d89; --ink-faint:#6b6152;
+    --gold:#f0b429; --ember:#e8622c; --line:rgba(240,180,41,0.14);
+    --flame: linear-gradient(120deg, #f0b429 0%, #e8622c 55%, #b03a1f 100%);
+    --maxw: 780px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg-0);color:var(--ink);font-family:'IBM Plex Sans Arabic',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;}
+  h1,h2{font-family:'Tajawal',sans-serif;font-weight:900;letter-spacing:-.01em;}
+  a{color:inherit;text-decoration:none;}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
+
+  header{position:sticky;top:0;z-index:100;background:rgba(10,8,6,0.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;max-width:var(--maxw);margin:0 auto;}
+  .logo{font-family:'Tajawal',sans-serif;font-weight:900;font-size:19px;}
+  .logo span{background:var(--flame);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .nav-links{display:flex;gap:20px;font-size:13.5px;color:var(--ink-dim);}
+  .nav-links a{transition:color .25s;}
+  .nav-links a:hover{color:var(--gold);}
+
+  .hero{padding:56px 0 8px;text-align:center;}
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:13px;letter-spacing:.12em;color:var(--gold);font-weight:500;margin-bottom:18px;}
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--gold);}
+  .hero h1{font-size:clamp(26px,4.5vw,38px);margin-bottom:12px;}
+  .hero p{color:var(--ink-dim);font-weight:300;font-size:15px;}
+
+  main{padding:40px 0 100px;}
+  .tool-card{border:1px solid var(--line);background:var(--bg-1);padding:36px;}
+
+  .field{margin-bottom:20px;}
+  .field label{display:block;font-size:13px;color:var(--ink-dim);margin-bottom:8px;letter-spacing:.03em;}
+  .field input[type=text]{width:100%;background:var(--bg-0);border:1px solid var(--line);color:var(--ink);padding:13px 16px;font-family:'IBM Plex Sans Arabic',sans-serif;font-size:14.5px;}
+  .field input[type=text]:focus{border-color:var(--gold);outline:none;}
+  .tone-options{display:flex;gap:10px;flex-wrap:wrap;}
+  .tone-btn{padding:10px 18px;border:1px solid var(--line);background:transparent;color:var(--ink-dim);cursor:pointer;font-size:13.5px;font-family:'IBM Plex Sans Arabic',sans-serif;transition:all .25s ease;}
+  .tone-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(240,180,41,.06);}
+
+  .btn-primary{background:var(--flame);color:#180d05;font-weight:700;font-size:14.5px;padding:13px 28px;border:none;cursor:pointer;transition:transform .25s ease, box-shadow .25s ease;font-family:'Tajawal',sans-serif;}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px -8px rgba(232,98,44,.6);}
+
+  .caption-results{margin-top:28px;display:flex;flex-direction:column;gap:14px;}
+  .caption-item{border:1px solid var(--line);padding:18px 20px;font-size:14.5px;line-height:1.9;position:relative;background:var(--bg-0);}
+  .caption-item .copy-btn{position:absolute;top:14px;left:14px;font-size:12px;color:var(--ink-faint);background:none;border:none;cursor:pointer;font-family:'IBM Plex Sans Arabic',sans-serif;transition:color .2s ease;}
+  .caption-item .copy-btn:hover{color:var(--gold);}
+
+  .note{margin-top:28px;font-size:12.5px;color:var(--ink-faint);border-top:1px solid var(--line);padding-top:18px;line-height:1.8;}
+
+  @media (max-width:640px){
+    .tool-card{padding:22px;}
+    .hero{padding:40px 0 8px;}
+    .wrap{padding:0 18px;}
+    nav{padding:14px 18px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="logo"><span>PHOENIX</span> AI</div>
+    <div class="nav-links">
+      <a href="ai-tools.html">← كل الأدوات</a>
+      <a href="index.html">الرئيسية</a>
+    </div>
+  </nav>
+</header>
+
+<div class="hero wrap">
+  <div class="eyebrow">أداة مجانية</div>
+  <h1>مولد الكابشن</h1>
+  <p>اكتب اسم منتجك أو فكرة المنشور، واختر نبرة الكتابة، وخذ ٣ اقتراحات جاهزة للنشر.</p>
+</div>
+
+<main class="wrap">
+  <div class="tool-card">
+    <div class="field">
+      <label>اسم المنتج / فكرة المنشور</label>
+      <input type="text" id="cap-input" placeholder="مثال: هودي شتوي أسود">
+    </div>
+
+    <div class="field">
+      <label>نبرة الكتابة</label>
+      <div class="tone-options">
+        <button class="tone-btn active" data-tone="bold">جريء وواثق</button>
+        <button class="tone-btn" data-tone="pro">احترافي وراقي</button>
+        <button class="tone-btn" data-tone="fun">مرح وخفيف</button>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="cap-btn">ولّد الكابشن</button>
+
+    <div class="caption-results" id="cap-results"></div>
+
+    <div class="note">مولّد ذكي يعتمد على قوالب وصياغات مدروسة، وليس نموذج توليد نصوص عميق — نتائج متنوعة وجاهزة للتعديل بسرعة.</div>
+  </div>
+</main>
+
+<script>
+  const capInput = document.getElementById('cap-input');
+  const capBtn = document.getElementById('cap-btn');
+  const capResults = document.getElementById('cap-results');
+  const toneBtns = document.querySelectorAll('.tone-btn');
+  let tone = 'bold';
+
+  toneBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      toneBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      tone = btn.dataset.tone;
+    });
+  });
+
+  const templates = {
+    bold: [
+      "{p} مو لأي حد. لو تعرف قيمتك، هذا مكانك.",
+      "{p} — صنعناه لمن يبي يفرق، مو يشبه الكل.",
+      "ثقة تُلبس. {p} جاهز يوصلك.",
+      "{p}. القرار خلك واثق، الباقي علينا."
+    ],
+    pro: [
+      "{p} — تصميم مدروس، وجودة تتكلم عن نفسها.",
+      "تفاصيل {p} صُممت لتدوم، لا لتُنسى.",
+      "{p}: حيث تلتقي الجودة بالبساطة.",
+      "اختيار {p} هو استثمار في مظهرك."
+    ],
+    fun: [
+      "{p} 🔥 وربي ما راح تندم!",
+      "هذا اللي كنت تدوره... {p} وصل أخيراً 🙌",
+      "{p} — خلك أنيق بدون ما تتعب حالك 😌",
+      "بصراحة {p} هذا لازم يكون بخزانتك 👀"
+    ]
+  };
+
+  const hashtagPool = ["#Phoenix", "#براند_عراقي", "#تصميم_احترافي", "#متجرك_يستاهل", "#جودة_تتكلم"];
+
+  function pickRandom(arr, n) {
+    const copy = [...arr];
+    const out = [];
+    while (out.length < n && copy.length) {
+      const i = Math.floor(Math.random() * copy.length);
+      out.push(copy.splice(i, 1)[0]);
+    }
+    return out;
+  }
+
+  capBtn.addEventListener('click', () => {
+    try {
+      const product = capInput.value.trim() || "منتجك";
+      const set = pickRandom(templates[tone], 3);
+      capResults.innerHTML = '';
+      set.forEach(t => {
+        const text = t.replace('{p}', product);
+        const tags = pickRandom(hashtagPool, 3).join(' ');
+        const item = document.createElement('div');
+        item.className = 'caption-item';
+        item.innerHTML = `<button class="copy-btn">نسخ</button><div>${text}</div><div style="color:var(--gold);margin-top:10px;font-size:13px">${tags}</div>`;
+        item.querySelector('.copy-btn').addEventListener('click', () => {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text + '\n' + tags).catch(() => {});
+          }
+          item.querySelector('.copy-btn').textContent = 'تم النسخ ✓';
+          setTimeout(() => { item.querySelector('.copy-btn').textContent = 'نسخ'; }, 1500);
+        });
+        capResults.appendChild(item);
+      });
+    } catch (err) {
+      console.error(err);
+      capResults.innerHTML = `<div class="caption-item" style="color:var(--ink-dim)">حدث خطأ: ${err && err.message ? err.message : 'خطأ غير معروف'}</div>`;
+    }
+  });
+</script>
+
+</body>
+</html>

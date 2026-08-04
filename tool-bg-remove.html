@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تفريغ الخلفية — أدوات Phoenix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#0a0806; --bg-1:#141009; --ink:#f3ead9; --ink-dim:#a99d89; --ink-faint:#6b6152;
+    --gold:#f0b429; --ember:#e8622c; --line:rgba(240,180,41,0.14);
+    --flame: linear-gradient(120deg, #f0b429 0%, #e8622c 55%, #b03a1f 100%);
+    --maxw: 780px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg-0);color:var(--ink);font-family:'IBM Plex Sans Arabic',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;}
+  h1,h2{font-family:'Tajawal',sans-serif;font-weight:900;letter-spacing:-.01em;}
+  a{color:inherit;text-decoration:none;}
+  img{display:block;max-width:100%;}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
+
+  header{position:sticky;top:0;z-index:100;background:rgba(10,8,6,0.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;max-width:var(--maxw);margin:0 auto;}
+  .logo{font-family:'Tajawal',sans-serif;font-weight:900;font-size:19px;}
+  .logo span{background:var(--flame);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .nav-links{display:flex;gap:20px;font-size:13.5px;color:var(--ink-dim);}
+  .nav-links a{transition:color .25s;}
+  .nav-links a:hover{color:var(--gold);}
+
+  .hero{padding:56px 0 8px;text-align:center;}
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:13px;letter-spacing:.12em;color:var(--gold);font-weight:500;margin-bottom:18px;}
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--gold);}
+  .hero h1{font-size:clamp(26px,4.5vw,38px);margin-bottom:12px;}
+  .hero p{color:var(--ink-dim);font-weight:300;font-size:15px;}
+
+  main{padding:40px 0 100px;}
+  .tool-card{border:1px solid var(--line);background:var(--bg-1);padding:36px;}
+
+  .drop-zone{border:1.5px dashed var(--line);padding:40px 20px;text-align:center;cursor:pointer;transition:border-color .3s ease, background .3s ease;margin-bottom:24px;}
+  .drop-zone:hover{border-color:var(--gold);background:rgba(240,180,41,0.04);}
+  .drop-zone p{color:var(--ink-dim);font-size:14px;}
+  input[type=file]{display:none;}
+
+  .preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+  .preview-box{
+    border:1px solid var(--line);
+    background:linear-gradient(45deg,#111 25%,transparent 25%),linear-gradient(-45deg,#111 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#111 75%),linear-gradient(-45deg,transparent 75%,#111 75%);
+    background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0px;background-color:#0d0d0d;
+    aspect-ratio:1;display:flex;align-items:center;justify-content:center;overflow:hidden;
+  }
+  .preview-box img{width:100%;height:100%;object-fit:contain;display:none;}
+  .preview-box .placeholder{color:var(--ink-faint);font-size:12.5px;text-align:center;padding:12px;}
+  .preview-label{font-size:12px;color:var(--ink-faint);margin-bottom:8px;letter-spacing:.05em;}
+
+  .btn-primary{background:var(--flame);color:#180d05;font-weight:700;font-size:14.5px;padding:13px 28px;border:none;cursor:pointer;transition:transform .25s ease, box-shadow .25s ease;font-family:'Tajawal',sans-serif;}
+  .btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px -8px rgba(232,98,44,.6);}
+  .btn-primary:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-ghost{padding:13px 26px;border:1px solid var(--line);color:var(--ink);font-size:14.5px;font-weight:600;font-family:'Tajawal',sans-serif;cursor:pointer;transition:border-color .25s ease;display:inline-flex;align-items:center;gap:8px;}
+  .btn-ghost:hover{border-color:var(--gold);}
+  .btn-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+
+  .status-msg{margin-top:16px;font-size:13.5px;color:var(--ink-dim);display:none;align-items:center;gap:8px;}
+  .status-msg.show{display:flex;}
+  .spinner{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--gold);animation:spin .8s linear infinite;flex-shrink:0;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .note{margin-top:28px;font-size:12.5px;color:var(--ink-faint);border-top:1px solid var(--line);padding-top:18px;line-height:1.8;}
+
+  @media (max-width:640px){
+    .preview-grid{grid-template-columns:1fr;}
+    .tool-card{padding:22px;}
+    .hero{padding:40px 0 8px;}
+    .wrap{padding:0 18px;}
+    nav{padding:14px 18px;}
+    .btn-row{flex-direction:column;align-items:stretch;}
+    .btn-row .btn-primary,.btn-row .btn-ghost{width:100%;justify-content:center;text-align:center;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="logo"><span>PHOENIX</span> AI</div>
+    <div class="nav-links">
+      <a href="ai-tools.html">← كل الأدوات</a>
+      <a href="index.html">الرئيسية</a>
+    </div>
+  </nav>
+</header>
+
+<div class="hero wrap">
+  <div class="eyebrow">أداة مجانية</div>
+  <h1>تفريغ الخلفية</h1>
+  <p>ارفع صورة منتج وخل الأداة تشيل الخلفية تلقائياً — تشتغل بالكامل داخل متصفحك.</p>
+</div>
+
+<main class="wrap">
+  <div class="tool-card">
+    <div class="drop-zone" id="bg-dropzone">
+      <p><strong style="color:var(--gold)">اضغط لاختيار صورة</strong> أو اسحبها هنا</p>
+    </div>
+    <input type="file" id="bg-input" accept="image/*">
+
+    <div class="preview-grid">
+      <div>
+        <div class="preview-label">الأصلية</div>
+        <div class="preview-box"><img id="bg-original"><span class="placeholder">لم يتم اختيار صورة بعد</span></div>
+      </div>
+      <div>
+        <div class="preview-label">بعد تفريغ الخلفية</div>
+        <div class="preview-box"><img id="bg-result"><span class="placeholder">ستظهر النتيجة هنا</span></div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="bg-btn" disabled>تفريغ الخلفية</button>
+      <a class="btn-ghost" id="bg-download" style="display:none" download="phoenix-no-bg.png">تحميل الصورة ↓</a>
+    </div>
+    <div class="status-msg" id="bg-status"><span class="spinner"></span><span class="txt"></span></div>
+
+    <div class="note">تعمل هذه الأداة بمعالجة الصورة مباشرة داخل متصفحك عبر نموذج ذكاء اصطناعي مفتوح المصدر. أول استخدام قد يستغرق وقتاً أطول لتحميل النموذج، وتحتاج اتصال بالإنترنت.</div>
+  </div>
+</main>
+
+<script type="module">
+  const bgDrop = document.getElementById('bg-dropzone');
+  const bgInput = document.getElementById('bg-input');
+  const bgOriginal = document.getElementById('bg-original');
+  const bgResult = document.getElementById('bg-result');
+  const bgBtn = document.getElementById('bg-btn');
+  const bgStatus = document.getElementById('bg-status');
+  const bgDownload = document.getElementById('bg-download');
+  let bgFile = null;
+
+  bgDrop.addEventListener('click', () => bgInput.click());
+  bgInput.addEventListener('change', e => handleBgFile(e.target.files[0]));
+  bgDrop.addEventListener('dragover', e => { e.preventDefault(); bgDrop.style.borderColor = 'var(--gold)'; });
+  bgDrop.addEventListener('dragleave', () => bgDrop.style.borderColor = '');
+  bgDrop.addEventListener('drop', e => {
+    e.preventDefault();
+    bgDrop.style.borderColor = '';
+    if (e.dataTransfer.files[0]) handleBgFile(e.dataTransfer.files[0]);
+  });
+
+  function handleBgFile(file) {
+    if (!file) return;
+    bgFile = file;
+    bgOriginal.src = URL.createObjectURL(file);
+    bgOriginal.style.display = 'block';
+    bgOriginal.parentElement.querySelector('.placeholder').style.display = 'none';
+    bgResult.style.display = 'none';
+    bgResult.parentElement.querySelector('.placeholder').style.display = 'block';
+    bgDownload.style.display = 'none';
+    bgBtn.disabled = false;
+  }
+
+  bgBtn.addEventListener('click', async () => {
+    if (!bgFile) return;
+    bgBtn.disabled = true;
+    bgStatus.classList.add('show');
+    bgStatus.querySelector('.txt').textContent = 'جاري تحميل النموذج ومعالجة الصورة… قد يستغرق هذا وقتاً أطول أول مرة';
+    try {
+      const mod = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal/+esm');
+      const removeBackground = mod.default || mod.removeBackground;
+      const blob = await removeBackground(bgFile);
+      const url = URL.createObjectURL(blob);
+      bgResult.src = url;
+      bgResult.style.display = 'block';
+      bgResult.parentElement.querySelector('.placeholder').style.display = 'none';
+      bgDownload.href = url;
+      bgDownload.style.display = 'inline-flex';
+      bgStatus.querySelector('.txt').textContent = 'تم بنجاح ✓';
+    } catch (err) {
+      console.error(err);
+      bgStatus.querySelector('.txt').textContent = 'تعذر تشغيل الأداة: ' + (err && err.message ? err.message : 'خطأ غير معروف') + ' — تأكد من اتصالك بالإنترنت وحاول مرة أخرى';
+    } finally {
+      bgBtn.disabled = false;
+    }
+  });
+</script>
+
+</body>
+</html>
