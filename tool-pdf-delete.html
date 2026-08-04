@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حذف صفحات PDF — أدوات Phoenix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<style>
+  :root{
+    --bg-0:#0a0806; --bg-1:#141009; --ink:#f3ead9; --ink-dim:#a99d89; --ink-faint:#6b6152;
+    --gold:#f0b429; --ember:#e8622c; --line:rgba(240,180,41,0.14);
+    --flame: linear-gradient(120deg, #f0b429 0%, #e8622c 55%, #b03a1f 100%);
+    --maxw: 780px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg-0);color:var(--ink);font-family:'IBM Plex Sans Arabic',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;}
+  h1,h2{font-family:'Tajawal',sans-serif;font-weight:900;letter-spacing:-.01em;}
+  a{color:inherit;text-decoration:none;}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
+
+  header{position:sticky;top:0;z-index:100;background:rgba(10,8,6,0.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;max-width:var(--maxw);margin:0 auto;}
+  .logo{font-family:'Tajawal',sans-serif;font-weight:900;font-size:19px;}
+  .logo span{background:var(--flame);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .nav-links{display:flex;gap:20px;font-size:13.5px;color:var(--ink-dim);}
+  .nav-links a{transition:color .25s;}
+  .nav-links a:hover{color:var(--gold);}
+
+  .hero{padding:56px 0 8px;text-align:center;}
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:13px;letter-spacing:.12em;color:var(--gold);font-weight:500;margin-bottom:18px;}
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--gold);}
+  .hero h1{font-size:clamp(26px,4.5vw,38px);margin-bottom:12px;}
+  .hero p{color:var(--ink-dim);font-weight:300;font-size:15px;}
+
+  main{padding:40px 0 100px;}
+  .tool-card{border:1px solid var(--line);background:var(--bg-1);padding:36px;}
+
+  .drop-zone{border:1.5px dashed var(--line);padding:40px 20px;text-align:center;cursor:pointer;transition:border-color .3s ease, background .3s ease;margin-bottom:20px;}
+  .drop-zone:hover{border-color:var(--gold);background:rgba(240,180,41,0.04);}
+  .drop-zone p{color:var(--ink-dim);font-size:14px;}
+  input[type=file]{display:none;}
+
+  .file-badge{
+    display:none;align-items:center;justify-content:space-between;gap:10px;
+    border:1px solid var(--line);background:var(--bg-0);padding:12px 16px;font-size:13.5px;color:var(--ink-dim);
+    margin-bottom:20px;
+  }
+  .file-badge.show{display:flex;}
+  .file-badge .pages{color:var(--gold);font-family:'Tajawal',sans-serif;font-weight:700;}
+
+  .field{display:none;margin-bottom:24px;}
+  .field.show{display:block;}
+  .field label{display:block;font-size:13px;color:var(--ink-dim);margin-bottom:8px;}
+  .field input[type=text]{width:100%;background:var(--bg-0);border:1px solid var(--line);color:var(--ink);padding:13px 16px;font-family:'IBM Plex Sans Arabic',sans-serif;font-size:14.5px;}
+  .field input[type=text]:focus{border-color:var(--gold);outline:none;}
+  .field .hint{font-size:12px;color:var(--ink-faint);margin-top:8px;}
+
+  .btn-primary{background:var(--flame);color:#180d05;font-weight:700;font-size:14.5px;padding:13px 28px;border:none;cursor:pointer;transition:transform .25s ease, box-shadow .25s ease;font-family:'Tajawal',sans-serif;}
+  .btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px -8px rgba(232,98,44,.6);}
+  .btn-primary:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-ghost{padding:13px 26px;border:1px solid var(--line);color:var(--ink);font-size:14.5px;font-weight:600;font-family:'Tajawal',sans-serif;cursor:pointer;transition:border-color .25s ease;display:inline-flex;align-items:center;gap:8px;}
+  .btn-ghost:hover{border-color:var(--gold);}
+  .btn-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+
+  .status-msg{margin-top:16px;font-size:13.5px;color:var(--ink-dim);display:none;align-items:center;gap:8px;}
+  .status-msg.show{display:flex;}
+  .spinner{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--gold);animation:spin .8s linear infinite;flex-shrink:0;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .note{margin-top:28px;font-size:12.5px;color:var(--ink-faint);border-top:1px solid var(--line);padding-top:18px;line-height:1.8;}
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="logo"><span>PHOENIX</span> AI</div>
+    <div class="nav-links">
+      <a href="ai-tools.html">← كل الأدوات</a>
+      <a href="index.html">الرئيسية</a>
+    </div>
+  </nav>
+</header>
+
+<div class="hero wrap">
+  <div class="eyebrow">أداة PDF مجانية</div>
+  <h1>حذف صفحات من PDF</h1>
+  <p>ارفع ملف PDF وحدد أرقام الصفحات اللي تبي تحذفها، وحمّل النسخة الجديدة.</p>
+</div>
+
+<main class="wrap">
+  <div class="tool-card">
+    <div class="drop-zone" id="dropzone">
+      <p><strong style="color:var(--gold)">اضغط لاختيار ملف PDF</strong> أو اسحبه هنا</p>
+    </div>
+    <input type="file" id="file-input" accept="application/pdf">
+
+    <div class="file-badge" id="file-badge">
+      <span class="name" id="file-name"></span>
+      <span class="pages" id="page-count"></span>
+    </div>
+
+    <div class="field" id="delete-field">
+      <label>أرقام الصفحات المطلوب حذفها</label>
+      <input type="text" id="delete-input" placeholder="مثال: 2, 5, 7">
+      <div class="hint">افصل بين الأرقام بفواصل</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="delete-btn" disabled>حذف الصفحات</button>
+      <a class="btn-ghost" id="download-btn" style="display:none" download="phoenix-edited.pdf">تحميل الملف ↓</a>
+    </div>
+    <div class="status-msg" id="status"><span class="spinner"></span><span class="txt"></span></div>
+
+    <div class="note">المعالجة كاملة داخل متصفحك، ملفك ما يُرفع لأي سيرفر.</div>
+  </div>
+</main>
+
+<script>
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('file-input');
+  const fileBadge = document.getElementById('file-badge');
+  const fileName = document.getElementById('file-name');
+  const pageCountEl = document.getElementById('page-count');
+  const deleteField = document.getElementById('delete-field');
+  const deleteInput = document.getElementById('delete-input');
+  const deleteBtn = document.getElementById('delete-btn');
+  const downloadBtn = document.getElementById('download-btn');
+  const status = document.getElementById('status');
+  let fileBytes = null;
+  let totalPages = 0;
+
+  dropzone.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+  dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.style.borderColor = 'var(--gold)'; });
+  dropzone.addEventListener('dragleave', () => dropzone.style.borderColor = '');
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.style.borderColor = '';
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  });
+
+  async function handleFile(file) {
+    if (!file || file.type !== 'application/pdf') return;
+    status.classList.remove('show');
+    downloadBtn.style.display = 'none';
+    fileBytes = await file.arrayBuffer();
+    try {
+      const doc = await PDFLib.PDFDocument.load(fileBytes);
+      totalPages = doc.getPageCount();
+      fileName.textContent = file.name;
+      pageCountEl.textContent = totalPages + ' صفحة';
+      fileBadge.classList.add('show');
+      deleteField.classList.add('show');
+      deleteBtn.disabled = false;
+    } catch (err) {
+      console.error(err);
+      fileBytes = null;
+    }
+  }
+
+  deleteBtn.addEventListener('click', async () => {
+    if (!fileBytes) return;
+    const raw = deleteInput.value.trim();
+    if (!raw) {
+      status.classList.add('show');
+      status.querySelector('.txt').textContent = 'اكتب رقم صفحة واحد على الأقل';
+      return;
+    }
+    const toDelete = raw.split(',')
+      .map(s => parseInt(s.trim(), 10))
+      .filter(n => !isNaN(n) && n >= 1 && n <= totalPages)
+      .map(n => n - 1);
+
+    if (toDelete.length === 0) {
+      status.classList.add('show');
+      status.querySelector('.txt').textContent = 'ما فيه أرقام صفحات صالحة، تأكد من النطاق';
+      return;
+    }
+    if (toDelete.length >= totalPages) {
+      status.classList.add('show');
+      status.querySelector('.txt').textContent = 'ما يمكن حذف كل صفحات الملف';
+      return;
+    }
+
+    deleteBtn.disabled = true;
+    status.classList.add('show');
+    status.querySelector('.txt').textContent = 'جاري حذف الصفحات…';
+    try {
+      const doc = await PDFLib.PDFDocument.load(fileBytes);
+      const uniqueSorted = [...new Set(toDelete)].sort((a, b) => b - a);
+      uniqueSorted.forEach(i => doc.removePage(i));
+      const newBytes = await doc.save();
+      const blob = new Blob([newBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      downloadBtn.href = url;
+      downloadBtn.style.display = 'inline-flex';
+      status.querySelector('.txt').textContent = 'تم الحذف بنجاح ✓';
+    } catch (err) {
+      console.error(err);
+      status.querySelector('.txt').textContent = 'حدث خطأ أثناء المعالجة، حاول مرة أخرى';
+    } finally {
+      deleteBtn.disabled = false;
+    }
+  });
+</script>
+
+</body>
+</html>
